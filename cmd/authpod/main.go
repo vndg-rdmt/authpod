@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -48,7 +49,7 @@ func hashPassword(password string) string {
 func main() {
 
 	postgres, err := pgxpool.New(context.Background(),
-		"postgresql://postgres:postgres@127.0.0.1:5432/postgres",
+		os.Getenv("POSTGRESQL_CONNSTRING"),
 	)
 	if err != nil {
 		panic(err)
@@ -69,7 +70,7 @@ func main() {
 				tokens.NewPostgres(postgres),
 			),
 		),
-		"0.0.0.0:6789",
+		os.Getenv("LISTEN_ADDR"),
 	)
 	if err != nil {
 		panic(err)

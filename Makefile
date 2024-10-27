@@ -6,6 +6,9 @@ compile:
 
 all: compile
 
+build.docker:
+	@docker build -t droptableusers:authpod -f build/Dockerfile .
+	@echo "\nnamed docker.io/library/droptableusers:authpod\n"
 
 docker.deploy.postgres:
 	@docker-compose -f ./deploy/postgres.docker-compose.yml -p droptableusers up -d
