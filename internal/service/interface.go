@@ -6,8 +6,8 @@ import (
 )
 
 type Token struct {
-	Token     string
-	ExpiresAt time.Time
+	Token     string    `json:"token"`
+	ExpiresAt time.Time `json:"expires_at"`
 }
 
 type Service interface {
