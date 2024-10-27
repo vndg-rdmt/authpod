@@ -1,43 +1,36 @@
 package auth
 
-import (
-	"context"
+// const (
+// 	MethodWebSession = "Web-Session"
+// )
 
-	"github.com/vndg-rdmt/authpod/internal/entity"
-	"github.com/vndg-rdmt/authpod/internal/repository/websessions"
-)
+// func NewSessionsMethod(repo websessions.Repository) AuthenticationMethod {
+// 	return &sessionsMethod{
+// 		websessions: repo,
+// 	}
+// }
 
-const (
-	MethodWebSession = "Web-Session"
-)
+// type sessionsMethod struct {
+// 	websessions websessions.Repository
+// }
 
-func NewSessionsMethod(repo websessions.Repository) AuthenticationMethod {
-	return &sessionsMethod{
-		websessions: repo,
-	}
-}
+// // Name implements AuthenticationMethod.
+// func (s *sessionsMethod) Name() string {
+// 	return MethodWebSession
+// }
 
-type sessionsMethod struct {
-	websessions websessions.Repository
-}
+// // Authenticate implements AuthenticationMethod.
+// func (s *sessionsMethod) Authenticate(ctx context.Context, sess *entity.User, secret string) (bool, error) {
+// 	var session entity.WebSession
 
-// Name implements AuthenticationMethod.
-func (s *sessionsMethod) Name() string {
-	return MethodWebSession
-}
+// 	ok, err := s.websessions.Get(ctx, secret, &session)
+// 	if err != nil {
+// 		return false, err
+// 	}
+// 	if !ok {
+// 		return false, nil
+// 	}
 
-// Authenticate implements AuthenticationMethod.
-func (s *sessionsMethod) Authenticate(ctx context.Context, sess *entity.User, secret string) (bool, error) {
-	var session entity.WebSession
-
-	ok, err := s.websessions.Get(ctx, secret, &session)
-	if err != nil {
-		return false, err
-	}
-	if !ok {
-		return false, nil
-	}
-
-	sess.Id = session.UserId
-	return false, nil
-}
+// 	sess.Id = session.UserId
+// 	return false, nil
+// }

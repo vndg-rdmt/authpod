@@ -3,13 +3,14 @@ package websessions
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/vndg-rdmt/authpod/internal/entity"
 )
 
-func NewPostgreSQL(postgres *pgxpool.Pool) Repository {
+func NewPostgres(postgres *pgxpool.Pool) Repository {
 	return &postgresInstance{
 		postgres: postgres,
 	}
@@ -28,24 +29,22 @@ func (p *postgresInstance) Delete(ctx context.Context, sessionId string) error {
 func (p *postgresInstance) Get(ctx context.Context, sessionId string, result *entity.WebSession) (bool, error) {
 	rows := p.postgres.QueryRow(ctx, `
 		SELECT
-			id,
+			session_id,
 			user_id,
 			created_at,
-			expires_at,
-			fingerprint
+			expires_at
 		FROM
-			auth.web_sessions
+			auth.websessions
 		WHERE
-			id = $1
+			session_id = $1
 		LIMIT 1;
 	`, sessionId)
 
 	if err := rows.Scan(
-		&result.Id,
+		&result.SessionId,
 		&result.UserId,
 		&result.CreatedAt,
 		&result.ExpiresAt,
-		&result.Fingerprint,
 	); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return false, nil
@@ -57,29 +56,28 @@ func (p *postgresInstance) Get(ctx context.Context, sessionId string, result *en
 }
 
 // Store implements Repository.
-func (p *postgresInstance) Store(ctx context.Context, session *entity.WebSession) error {
-	_, err := p.postgres.Exec(ctx, `
-		INSERT INTO auth.web_sessions
+func (p *postgresInstance) Create(ctx context.Context, userId int64, expiresAt time.Time) (string, error) {
+	var sessId string
+	err := p.postgres.QueryRow(ctx, `
+		INSERT INTO auth.websessions
 		(
-			id,
 			user_id,
-			created_at,
-			expires_at,
-			fingerprint
+			expires_at
 		)
 		VALUES
 		(
 			$1,
-			$2,
-			$3,
-			$4
-		);
+			$2
+		)
+		RETURNING session_id;
 	`,
-		session.Id,
-		session.UserId,
-		session.CreatedAt,
-		session.ExpiresAt,
-		session.Fingerprint,
-	)
-	return err
+		userId,
+		expiresAt,
+	).Scan(&sessId)
+
+	if err != nil {
+		return "", err
+	}
+
+	return sessId, nil
 }
