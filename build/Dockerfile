@@ -7,7 +7,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o /app/bin/app ./cmd/authpod/main.go
+RUN go build -o /app/bin/app ./cmd/authpod/*.go
 
 FROM alpine:latest
 
