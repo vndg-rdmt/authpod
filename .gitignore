@@ -1,0 +1,9 @@
+bin
+out
+*.out
+tmp
+temp
+*.tmp
+*.temp
+.env
+
