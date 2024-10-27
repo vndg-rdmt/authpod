@@ -7,8 +7,11 @@ compile:
 all: compile
 
 build.docker:
-	@docker build -t droptableusers:$(target) -f build/Dockerfile .
-	@echo "\nnamed docker.io/library/droptableusers:$(target)\n"
+	@docker build -t vndgindex/$(target) -f build/Dockerfile .
+	@echo "\nnamed vndgindex/$(target)\n"
+
+push.docker:
+	@docker image push vndgindex/$(target)
 
 docker.deploy.postgres:
 	@docker-compose -f ./deploy/postgres.docker-compose.yml -p droptableusers up -d

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"math/rand"
 	"os"
 	"time"
@@ -55,12 +54,10 @@ func main() {
 		panic(err)
 	}
 
+	migrate(postgres)
+
 	usersrepo := users.NewPostgres(postgres)
-
-	password := generatePassword(20, true, true, true)
-	fmt.Println("password - ", password)
-
-	usersrepo.Create(context.Background(), "admin", hashPassword(password))
+	initroot(usersrepo)
 
 	err = transport.NewHttp(
 		controller.NewFiber(
